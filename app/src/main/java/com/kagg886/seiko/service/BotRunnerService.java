@@ -1,5 +1,6 @@
 package com.kagg886.seiko.service;
 
+import android.annotation.SuppressLint;
 import android.app.*;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,9 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
 
 
 /**
@@ -70,10 +74,16 @@ public class BotRunnerService extends Service {
         return lastLoad;
     }
 
+    @SuppressLint({"ForegroundServiceType", "WrongConstant"})
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         INSTANCE = this;
-        startForeground(114514, getNotification("Seiko启动成功"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(114514, getNotification("Seiko启动成功"), FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else {
+            startForeground(114514, getNotification("Seiko启动成功"));
+        }
+
         new Thread(() -> {
             int i = 0;
             while (true) {

@@ -1,11 +1,10 @@
 package com.kagg886.seiko.activity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.os.*;
 import android.widget.LinearLayout;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(new ModuleAdapter.Structure(getText(str).toString(), fragment));
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,15 +158,22 @@ public class MainActivity extends AppCompatActivity {
         dialogBroadCast = new DialogBroadCast(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(DialogBroadCast.TAG);
-        registerReceiver(dialogBroadCast, filter);
-
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(dialogBroadCast, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(dialogBroadCast, filter);
+        }
         //初始化SnackBar广播
         LinearLayout rootView = findViewById(R.id.activity_main_root);
         snackBroadCast = new SnackBroadCast(rootView);
         filter = new IntentFilter();
         filter.addAction(SnackBroadCast.TAG);
-        registerReceiver(snackBroadCast, filter);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(snackBroadCast, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(snackBroadCast, filter);
+        }
         TabLayout layout = findViewById(R.id.activity_main_view_tab_layout);
         ViewPager pager = findViewById(R.id.activity_main_view_view_pager);
         adapter = new ModuleAdapter(getSupportFragmentManager());
